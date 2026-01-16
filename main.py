@@ -66,18 +66,18 @@ class HomeCentralMaid:
             True if initialization successful
         """
         try:
-            print("Initializing HomeCentralMaid...")
+            print("✨ Catnip 正在启动喵~ (ฅ^•ﻌ•^ฅ)")
 
             # Step 1: Load configuration
-            print("  [1/6] Loading configuration...")
+            print("  [1/6] 正在加载配置文件喵...")
             self.config = ConfigManager()
             if not self.config.load(env=self.env):
-                print("  [FAIL] Configuration loading failed")
+                print("  ✗ 配置加载失败了喵... (｡•́︿•̀｡)")
                 return False
-            print(f"  [OK] Configuration loaded ({self.env})")
+            print(f"  ✓ 配置加载完成喵~ ({self.env})")
 
             # Step 2: Setup logging
-            print("  [2/6] Setting up logging...")
+            print("  [2/6] 正在配置日志系统喵...")
             self.logger = setup_logging(
                 log_dir=self.config.get('system.log_dir', 'logs'),
                 log_level=self.config.get('system.log_level', 'INFO'),
@@ -87,39 +87,39 @@ class HomeCentralMaid:
             app_version = self.config.get('system.version')
             self.logger.info(f"Starting {app_name} v{app_version}")
             self.logger.info(f"Environment: {self.env}")
-            print(f"  [OK] Logging configured")
+            print(f"  ✓ 日志系统就绪喵~")
 
             # Step 3: Initialize database
-            print("  [3/6] Connecting to database...")
+            print("  [3/6] 正在连接数据库喵...")
             self.database = Database(
                 db_path=self.config.get('database.path', 'data/catnip.db')
             )
             if not self.database.connect():
                 self.logger.error("Database connection failed")
-                print("  [FAIL] Database connection failed")
+                print("  ✗ 数据库连接失败了喵... (｡•́︿•̀｡)")
                 return False
-            print(f"  [OK] Database connected")
+            print(f"  ✓ 数据库连接成功喵~")
 
             # Step 4: Initialize providers
-            print("  [4/6] Initializing providers...")
+            print("  [4/6] 正在初始化服务提供者喵...")
 
             # Email provider
             email_config = self.config.get('email')
             self.email_provider = IMAPSMTPProvider(email_config, self.logger)
             if not self.email_provider.connect():
                 self.logger.error("Email provider connection failed")
-                print("  [FAIL] Email provider connection failed")
+                print("  ✗ 邮件服务连接失败了喵... (｡•́︿•̀｡)")
                 return False
-            print("    - Email provider connected")
+            print("    ✓ 邮件服务已连接喵~")
 
             # LLM provider
             llm_config = self.config.get('llm')
             self.llm_provider = OllamaProvider(llm_config, self.logger)
             # Note: We don't test LLM connection here as it might not be running yet
-            print(f"    - LLM provider initialized ({self.llm_provider.get_model_name()})")
+            print(f"    ✓ AI助手已就绪喵~ (模型: {self.llm_provider.get_model_name()})")
 
             # Step 5: Initialize plugin registry and register plugins
-            print("  [5/6] Registering plugins...")
+            print("  [5/6] 正在注册插件喵...")
             self.plugin_registry = PluginRegistry(self.logger)
 
             enabled_plugins = self.config.get('plugins.enabled', [])
@@ -132,32 +132,32 @@ class HomeCentralMaid:
                 if plugin_name == "movie_download":
                     if self.plugin_registry.register(MovieDownloadPlugin, plugin_config):
                         registered_count += 1
-                        print(f"    - Registered: movie_download")
+                        print(f"    ✓ 已注册插件: 电影下载")
                     else:
                         self.logger.warning(f"Failed to register plugin: {plugin_name}")
-                        print(f"    - [WARN] Failed to register: {plugin_name}")
+                        print(f"    ⚠ 插件注册失败: {plugin_name}")
                 # Add more plugins here as they're developed
 
-            print(f"  [OK] {registered_count}/{len(enabled_plugins)} plugins registered")
+            print(f"  ✓ 已注册 {registered_count}/{len(enabled_plugins)} 个插件喵~")
 
             # Step 6: Initialize command dispatcher
-            print("  [6/6] Initializing command dispatcher...")
+            print("  [6/6] 正在初始化命令调度器喵...")
             self.dispatcher = CommandDispatcher(
                 self.plugin_registry,
                 self.llm_provider,
                 self.logger
             )
-            print(f"  [OK] Command dispatcher ready")
+            print(f"  ✓ 命令调度器就绪喵~")
 
             self.logger.info("All components initialized successfully")
-            print("\n[SUCCESS] HomeCentralMaid initialized successfully!\n")
+            print("\n✨ Catnip 已完全启动！准备为主人服务喵~ (ฅ•ω•ฅ)♡\n")
             return True
 
         except Exception as e:
             if self.logger:
                 self.logger.error(f"Initialization failed: {e}", exc_info=True)
             else:
-                print(f"[FAIL] Initialization failed: {e}")
+                print(f"✗ 初始化失败了喵... {e} (｡•́︿•̀｡)")
                 import traceback
                 traceback.print_exc()
             return False
@@ -169,10 +169,10 @@ class HomeCentralMaid:
 
         app_name = self.config.get('system.app_name', 'Catnip')
         self.logger.info(f"{app_name} 正在监视邮件喵喵... (polling every {poll_interval}s)")
-        print(f"{app_name} 正在监视邮件喵喵...")
-        print(f"轮询间隔: {poll_interval} 秒")
-        print(f"允许的发件人: {self.config.get('email.allowed_senders', [])}")
-        print("\n按 Ctrl+C 停止\n")
+        print(f"📧 {app_name} 正在认真监视邮件喵喵~ (*^ω^*)")
+        print(f"⏱️  轮询间隔: {poll_interval} 秒")
+        print(f"👤 允许的主人: {', '.join(self.config.get('email.allowed_senders', []))}")
+        print(f"\n💡 按 Ctrl+C 可以让 Catnip 休息喵~\n")
 
         while self.running:
             try:
@@ -181,8 +181,9 @@ class HomeCentralMaid:
 
                 for msg in messages:
                     self.logger.info(f"处理邮件 - 发件人: {msg.sender}, 主题: {msg.subject}")
-                    print(f"\n[新邮件] 发件人: {msg.sender}")
-                    print(f"        主题: {msg.subject}")
+                    print(f"\n✉️  收到主人的新邮件喵~")
+                    print(f"📨 发件人: {msg.sender}")
+                    print(f"📝 主题: {msg.subject}")
 
                     # Process email through dispatcher
                     start_time = time.time()
@@ -218,11 +219,11 @@ class HomeCentralMaid:
 
             except KeyboardInterrupt:
                 self.logger.info("收到中断信号，正在关闭...")
-                print("\n\n正在关闭...")
+                print("\n\n💤 Catnip 准备休息了喵...")
                 self.running = False
             except Exception as e:
                 self.logger.error(f"主循环错误: {e}", exc_info=True)
-                print(f"[ERROR] {e}")
+                print(f"❌ 出现错误了喵: {e}")
                 time.sleep(poll_interval)
 
     def _send_response_email(self, original_msg, results):
@@ -255,7 +256,7 @@ Catnip 会继续为您服务的喵~ 🐾
 Catnip 家庭女仆管家
 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 """
-                print("  [OK] 所有命令执行成功")
+                print("  ✓ 所有命令执行成功喵~")
 
             else:
                 # Some commands failed
@@ -276,7 +277,7 @@ Catnip 家庭女仆管家
 Catnip 家庭女仆管家
 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 """
-                print("  [WARN] 部分命令执行失败")
+                print("  ⚠ 部分命令执行失败了喵...")
 
             # Send email
             if self.email_provider.send_message(
@@ -284,18 +285,18 @@ Catnip 家庭女仆管家
                 subject=reply_subject,
                 body=reply_body
             ):
-                print("  [OK] 回复邮件已发送")
+                print("  ✓ 回复邮件已发送喵~")
             else:
-                print("  [FAIL] 回复邮件发送失败")
+                print("  ✗ 回复邮件发送失败了喵... (｡•́︿•̀｡)")
 
         except Exception as e:
             self.logger.error(f"发送回复邮件失败: {e}", exc_info=True)
-            print(f"  [ERROR] 发送回复失败: {e}")
+            print(f"  ❌ 发送回复失败了喵: {e}")
 
     def shutdown(self):
         """Graceful shutdown"""
         self.logger.info("Shutting down HomeCentralMaid...")
-        print("\nShutting down...")
+        print("\n🌙 Catnip 正在优雅地关闭喵...")
 
         self.running = False
 
@@ -309,7 +310,7 @@ Catnip 家庭女仆管家
             self.database.close()
 
         self.logger.info("Shutdown complete")
-        print("Shutdown complete. Goodbye!\n")
+        print("✨ 关闭完成！Catnip 去休息了喵~ 晚安主人~ (zzZ) 🐾\n")
 
 
 def main():
@@ -319,7 +320,11 @@ def main():
 
     # Banner
     print("\n" + "=" * 60)
-    print("  HomeCentralMaid - Catnip 家庭中央女仆系统 v2.0.0")
+    print("  🐱 HomeCentralMaid - Catnip 家庭中央女仆系统 v2.0.0 🐱")
+    print("=" * 60)
+    print("         ∧＿∧   Catnip 随时准备为主人服务喵~")
+    print("        (  •ω• )  ")
+    print("        /    づ♡")
     print("=" * 60 + "\n")
 
     # Create application
@@ -327,7 +332,7 @@ def main():
 
     # Setup signal handlers for graceful shutdown
     def signal_handler(signum, frame):
-        print("\n\n[SIGNAL] 收到关闭信号...")
+        print("\n\n💤 收到休息信号喵...")
         app.shutdown()
         sys.exit(0)
 
@@ -339,14 +344,14 @@ def main():
         try:
             app.run()
         except Exception as e:
-            print(f"\n[FATAL ERROR] {e}")
+            print(f"\n❌ 严重错误喵: {e}")
             import traceback
             traceback.print_exc()
             app.shutdown()
             sys.exit(1)
     else:
-        print("\n[FAIL] 应用初始化失败")
-        print("请检查配置文件和日志")
+        print("\n✗ Catnip 启动失败了喵... (｡•́︿•̀｡)")
+        print("请检查配置文件和日志喵~")
         sys.exit(1)
 
 
