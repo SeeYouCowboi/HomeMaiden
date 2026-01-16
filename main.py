@@ -18,8 +18,22 @@ Version: 2.0.0
 import sys
 import time
 import signal
+import os
 from datetime import datetime
 from pathlib import Path
+
+# Set UTF-8 encoding for Windows console
+if sys.platform == 'win32':
+    try:
+        # Try to set console to UTF-8
+        os.system('chcp 65001 >nul 2>&1')
+        # Set stdout encoding to UTF-8
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8')
+        if hasattr(sys.stderr, 'reconfigure'):
+            sys.stderr.reconfigure(encoding='utf-8')
+    except:
+        pass  # If it fails, continue with default encoding
 
 # Add project root to Python path
 sys.path.insert(0, str(Path(__file__).parent))

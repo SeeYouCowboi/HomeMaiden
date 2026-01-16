@@ -3,12 +3,73 @@ Logging Configuration
 
 Centralized logging setup for HomeCentralMaid.
 Logs to both file and console with structured formatting.
+Supports colorized console output for better readability.
 """
 
 import logging
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
+
+# Try to import colorama for Windows color support
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+    COLORAMA_AVAILABLE = True
+except ImportError:
+    COLORAMA_AVAILABLE = False
+    # Fallback: define empty color codes
+    class Fore:
+        RED = ''
+        YELLOW = ''
+        GREEN = ''
+        CYAN = ''
+        WHITE = ''
+        LIGHTBLACK_EX = ''
+
+    class Style:
+        BRIGHT = ''
+        RESET_ALL = ''
+
+
+class ColoredFormatter(logging.Formatter):
+    """
+    Custom formatter that adds colors to log levels
+
+    Color scheme:
+    - DEBUG: Gray (Cyan dimmed)
+    - INFO: Green
+    - WARNING: Yellow
+    - ERROR: Red
+    - CRITICAL: Bright Red
+    """
+
+    # Define color codes for each log level
+    COLORS = {
+        'DEBUG': Fore.CYAN,
+        'INFO': Fore.GREEN,
+        'WARNING': Fore.YELLOW,
+        'ERROR': Fore.RED,
+        'CRITICAL': Fore.RED + Style.BRIGHT,
+    }
+
+    def format(self, record):
+        # Save original levelname
+        original_levelname = record.levelname
+
+        # Add color to levelname if available
+        if COLORAMA_AVAILABLE:
+            color = self.COLORS.get(record.levelname, '')
+            record.levelname = f"{color}{record.levelname}{Style.RESET_ALL}"
+
+        # Format the message
+        result = super().format(record)
+
+        # Restore original levelname
+        record.levelname = original_levelname
+
+        return result
 
 
 def setup_logging(
@@ -41,8 +102,15 @@ def setup_logging(
     # Configure logging level
     level = getattr(logging, log_level.upper(), logging.INFO)
 
-    # Create formatter
-    formatter = logging.Formatter(
+    # Create formatters
+    # File formatter: plain text without colors
+    file_formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    # Console formatter: colorized for better readability
+    console_formatter = ColoredFormatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
@@ -50,12 +118,12 @@ def setup_logging(
     # Setup file handler
     file_handler = logging.FileHandler(log_filename, encoding='utf-8')
     file_handler.setLevel(level)
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(file_formatter)
 
     # Setup console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
-    console_handler.setFormatter(formatter)
+    console_handler.setFormatter(console_formatter)
 
     # Configure root logger
     root_logger = logging.getLogger()

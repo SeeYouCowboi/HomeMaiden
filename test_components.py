@@ -125,7 +125,7 @@ def test_database():
 
 
 def test_logger():
-    """Test logger setup"""
+    """Test logger setup and colored output"""
     print("\n" + "=" * 60)
     print("Testing Logger...")
     print("=" * 60)
@@ -133,24 +133,30 @@ def test_logger():
     try:
         from core.logger import setup_logging, get_logger
 
-        # Setup logger
+        # Setup logger with DEBUG level to show all colors
         main_logger = setup_logging(
             log_dir="logs",
-            log_level="INFO",
+            log_level="DEBUG",
             app_name="HomeCentralMaid"
         )
 
         print("[OK] Logger initialized")
 
-        # Test logging
-        main_logger.info("This is a test info message")
-        main_logger.debug("This is a test debug message (should not appear in INFO level)")
+        # Test all log levels to show colored output
+        print("\n  Testing colored output for all log levels:")
+        main_logger.debug("  DEBUG message (Cyan)")
+        main_logger.info("  INFO message (Green)")
+        main_logger.warning("  WARNING message (Yellow)")
+        main_logger.error("  ERROR message (Red)")
+        main_logger.critical("  CRITICAL message (Bright Red)")
 
         # Get module logger
+        print("\n  Testing module logger:")
         module_logger = get_logger("TestModule")
-        module_logger.info("Module logger working")
+        module_logger.info("  Module logger working")
 
-        print("[OK] Logging working correctly")
+        print("\n[OK] Logging working correctly with colored output")
+        print("     Color scheme: DEBUG=Cyan, INFO=Green, WARNING=Yellow, ERROR=Red, CRITICAL=Bright Red")
         return True
 
     except Exception as e:
