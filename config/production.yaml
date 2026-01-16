@@ -1,0 +1,14 @@
+# HomeCentralMaid Production Configuration
+# 生产环境配置覆盖
+
+# 注意：base.yaml 已经包含了所有生产环境的默认配置
+# 这个文件是可选的，只在需要覆盖 base.yaml 中的特定值时才添加内容
+
+# 示例：如果你有多个生产环境
+# system:
+#   log_level: "WARNING"  # 生产环境可以设置更高的日志级别
+
+# email:
+#   poll_interval: 60  # 生产环境可以设置更长的轮询间隔
+
+# 当前：使用 base.yaml 的所有默认配置
