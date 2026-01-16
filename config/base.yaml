@@ -1,0 +1,51 @@
+# HomeCentralMaid Base Configuration
+# This file contains default configuration for all environments
+
+system:
+  app_name: "HomeCentralMaid"
+  version: "2.0.0"
+  environment: "production"
+  log_level: "INFO"
+  log_dir: "logs"
+  data_dir: "data"
+
+email:
+  provider: "imap_smtp"
+  poll_interval: 30  # seconds between email checks
+  imap_server: "imap.qq.com"
+  smtp_server: "smtp.qq.com"
+  smtp_port: 587
+  username: "${EMAIL_USER}"  # Will be replaced with environment variable
+  password: "${EMAIL_PASS}"  # Will be replaced with environment variable
+  allowed_senders:
+    - "teacatjazz@gmail.com"
+
+llm:
+  provider: "ollama"
+  model: "qwen3:8b"
+  system_prompt: |
+    你是一个名为 Catnip 的家庭猫娘女仆管家。
+    任务：将用户邮件内容转为 JSON 指令。
+    格式：[{"action": "download_movie", "title": "电影名"}]
+    注意：只输出 JSON 数组，不要任何解释。
+
+database:
+  type: "sqlite"
+  path: "data/catnip.db"
+
+plugins:
+  enabled:
+    - "movie_download"
+
+  movie_download:
+    radarr_url: "http://localhost:7878/api/v3"
+    radarr_api_key: "${RADARR_API_KEY}"
+    root_folder: "D:\\Movies"
+    quality_profile_id: 1
+    auto_search: true
+
+task_queue:
+  enabled: false  # Set to true to enable background task queue
+  worker_threads: 2
+  max_retries: 3
+  retry_delay: 60  # seconds

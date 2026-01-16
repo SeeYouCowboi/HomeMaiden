@@ -1,0 +1,12 @@
+# HomeCentralMaid Development Configuration
+# Overrides for development environment
+
+system:
+  environment: "development"
+  log_level: "DEBUG"
+
+email:
+  poll_interval: 10  # Faster polling in dev for testing
+
+database:
+  path: "data/catnip_dev.db"
