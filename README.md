@@ -1,4 +1,4 @@
-# HomeCentralMaid v2.0.0
+# HomeMaiden V0.1.2
 
 > 家庭中央女仆系统 - Catnip 喵~
 
